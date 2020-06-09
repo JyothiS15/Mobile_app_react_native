@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { ScrollView, FlatList ,Text} from 'react-native';
+import { ScrollView, FlatList ,Text,View} from 'react-native';
 import {Card} from 'react-native-elements';
 import {DISHES} from '../shared/dishes';
 import {PROMOTIONS }from '../shared/promotions';
@@ -37,7 +37,7 @@ class Home extends Component {
 
 
     static navigationOptions = {
-        title: 'Home'
+        title: 'Home',
     };
 
     render() {
