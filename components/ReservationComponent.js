@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { Card } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
-import {ScrollView, Text, View, StyleSheet, Picker, Switch, Button, Modal } from 'react-native';
-
-
-
+import {ScrollView, Text, View, StyleSheet, Picker, Switch, Button, Modal,Alert } from 'react-native';
+import * as Animatable from 'react-native-animatable';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 class Reservation extends Component {
 
     constructor(props) {
@@ -14,20 +14,38 @@ class Reservation extends Component {
             guests: 1,
             smoking: false,
             date: '',
-            showModal: false
+            showModal: false,
+            title: 'Reserve Table'
         }
     }
 
     static navigationOptions = {
         title: 'Reserve Table',
     };
-    toggleModal() {
-           this.setState({showModal: !this.state.showModal});
-       }
 
        handleReservation() {
            console.log(JSON.stringify(this.state));
-           this.toggleModal();
+           Alert.alert(
+      'Your Reservation OK?',
+      'Number of Guests: '+this.state.guests+'\n\n'+'Smoking?: '+this.state.smoking+'\n\n'+'Date and Time: '+this.state.date,
+      [
+          {
+              text:'Cancel',
+              onPress:()=>this.resetForm(),
+              style:'cancel'
+          },
+          {
+              text:'OK',
+              onPress:()=>{
+                this.presentLocalNotification(this.state.date);
+
+                this.resetForm();
+
+              }
+          }
+      ],
+      {cancelable:false}
+  )
        }
        resetForm() {
             this.setState({
@@ -37,9 +55,35 @@ class Reservation extends Component {
                 showModal: false
             });
         }
+        async obtainNotificationPermission() {
+                let permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);
+                if (permission.status !== 'granted') {
+                    permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+                    if (permission.status !== 'granted') {
+                        Alert.alert('Permission not granted to show notifications');
+                    }
+                }
+                return permission;
+            }
+            async presentLocalNotification(date) {
+                    await this.obtainNotificationPermission();
+                    Notifications.presentLocalNotificationAsync({
+                        title: 'Your Reservation',
+                        body: 'Reservation for '+ date + ' requested',
+                        ios: {
+                            sound: true
+                        },
+                        android: {
+                            sound: true,
+                            vibrate: true,
+                            color: '#512DA8'
+                        }
+                    });
+                }
 
     render() {
         return(
+          <Animatable.View animation="zoomIn" duration={2000}>
             <ScrollView>
                 <View style={styles.formRow}>
                 <Text style={styles.formLabel}>Number of Guests</Text>
@@ -99,24 +143,9 @@ class Reservation extends Component {
                     />
                 </View>
 
-                <Modal animationType = {"slide"} transparent = {false}
-                    visible = {this.state.showModal}
-                    onDismiss = {() => this.toggleModal() }
-                    onRequestClose = {() => this.toggleModal() }>
-                    <View style = {styles.modal}>
-                        <Text style = {styles.modalTitle}>Your Reservation</Text>
-                        <Text style = {styles.modalText}>Number of Guests: {this.state.guests}</Text>
-                        <Text style = {styles.modalText}>Smoking?: {this.state.smoking ? 'Yes' : 'No'}</Text>
-                        <Text style = {styles.modalText}>Date and Time: {this.state.date}</Text>
 
-                        <Button
-                            onPress = {() =>{this.toggleModal(); this.resetForm();}}
-                            color="#512DA8"
-                            title="Close"
-                            />
-                    </View>
-                </Modal>
             </ScrollView>
+            </Animatable.View>
         );
     }
 
