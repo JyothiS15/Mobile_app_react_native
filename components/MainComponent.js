@@ -4,7 +4,7 @@ import Home from './HomeComponent';
 import Contacts from './ContactComponent';
 import About from './AboutComponent';
 import Dishdetail from './DishdetailComponent.js';
-import { View,Platform, Image,StyleSheet ,ScrollView,Text} from 'react-native';
+import { View,Platform, Image,StyleSheet ,ScrollView,Text,  ToastAndroid} from 'react-native';
 import { createStackNavigator, createDrawerNavigator ,DrawerItems,SafeAreaView } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
@@ -12,7 +12,7 @@ import Reservation from './ReservationComponent';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
 import Favorites from './FavoriteComponent';
 import Login from './LoginComponent';
-
+//import {NetInfo} from "@react-native-community/netinfo";
 const mapStateToProps = state => {
   return {
     dishes: state.dishes,
@@ -314,7 +314,10 @@ class Main extends Component{
   this.props.fetchComments();
   this.props.fetchPromos();
   this.props.fetchLeaders();
+
 }
+
+
 
   render(){
     return(
